@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Inventory Admin | Lipa Phones Kenya</title>
+  <meta name="description" content="Mobile-First Smartphone Inventory Management & Stock Controller" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheets -->
+  <script type="module" crossorigin src="/assets/admin-BOlte3Yn.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/store-BAgcX4VC.js">
+  <link rel="stylesheet" crossorigin href="/assets/store-Dnu8L-wu.css">
+  <link rel="stylesheet" crossorigin href="/assets/admin-onqVU8VT.css">
+</head>
+<body style="padding-bottom: 2rem;">
+
+  <!-- ===== ADMIN LOGIN OVERLAY ===== -->
+  <div id="adminLoginOverlay" style="
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(145deg, rgba(236,253,245,0.85) 0%, rgba(245,249,255,0.88) 100%);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    padding: 1.5rem;
+  ">
+    <div style="
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(16,185,129,0.12), 0 2px 8px rgba(0,0,0,0.06);
+      padding: 2.5rem 2rem;
+      width: 100%; max-width: 380px;
+      backdrop-filter: blur(12px);
+    ">
+      <div style="text-align:center; margin-bottom:1.75rem;">
+        <img src="/assets/logo.png" alt="Simu Rahisi" style="height:52px; margin:0 auto 1rem;" />
+        <h1 style="font-size:1.3rem; font-weight:800; color:var(--text-primary); margin-bottom:0.3rem;">Admin Login</h1>
+        <p style="font-size:0.85rem; color:var(--text-muted);">Enter your password to access the dashboard</p>
+      </div>
+
+      <div id="loginError" style="
+        display:none;
+        background:#fee2e2; color:#b91c1c;
+        border:1px solid #fca5a5; border-radius:8px;
+        padding:0.6rem 0.85rem; font-size:0.85rem; font-weight:600;
+        margin-bottom:1rem;
+      ">❌ Incorrect password. Please try again.</div>
+
+      <form id="loginForm" style="display:flex; flex-direction:column; gap:1rem;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="loginPassword" class="form-label">Password</label>
+          <div style="position:relative;">
+            <input type="password" id="loginPassword" class="form-input"
+              placeholder="Enter admin password" autocomplete="current-password"
+              style="padding-right:3rem;" required />
+            <button type="button" id="togglePwdVisibility" style="
+              position:absolute; right:0.75rem; top:50%; transform:translateY(-50%);
+              background:none; border:none; cursor:pointer; font-size:1.1rem; color:var(--text-muted);
+            " aria-label="Toggle password visibility">👁️</button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">
+          🔐 Access Dashboard
+        </button>
+      </form>
+
+      <p style="text-align:center; font-size:0.78rem; color:var(--text-muted); margin-top:1.25rem;">
+        <a href="./index.html" style="color:var(--primary-600); font-weight:600;">← Back to Store</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Admin content (hidden until authenticated) -->
+  <div id="adminContent" style="display:none;">
+
+  <!-- Admin Header -->
+  <header class="admin-header-bar">
+    <div class="admin-title-wrap">
+      <a href="./index.html" class="logo-brand">
+        <img src="/assets/logo.png" alt="Simu Rahisi Logo" class="brand-logo-img" style="height: 36px;" />
+      </a>
+      <span class="admin-badge">ADMIN</span>
+    </div>
+
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <a href="./index.html" class="btn btn-call btn-sm">
+        ⬅ Back to Store
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="section-container" style="padding-top: 1.5rem;">
+    <!-- Stats Row -->
+    <div class="admin-stats-grid">
+      <div class="stat-card">
+        <span class="stat-val" id="statTotalPhones">0</span>
+        <span class="stat-lbl">Total Models</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-val" id="statInStock" style="color: var(--status-in-stock-text);">0</span>
+        <span class="stat-lbl">In Stock</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-val" id="statLowStock" style="color: var(--status-low-stock-text);">0</span>
+        <span class="stat-lbl">Low Stock</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-val" id="statOutStock" style="color: var(--status-out-stock-text);">0</span>
+        <span class="stat-lbl">Out of Stock</span>
+      </div>
+    </div>
+
+    <!-- Inventory Header Controls -->
+    <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+        <h1 style="font-size: 1.4rem; font-weight: 800;">Inventory Catalog Manager</h1>
+        <button class="btn btn-primary" id="btnAddNewPhone">
+          ➕ Add New Smartphone
+        </button>
+      </div>
+
+      <!-- Filters & Search Toolbar -->
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="adminSearchInput" placeholder="Search inventory by phone name or brand..." aria-label="Search admin inventory" />
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <label for="adminStatusFilter" style="font-size: 0.85rem; font-weight: 600; white-space: nowrap;">Status Filter:</label>
+          <select id="adminStatusFilter" class="form-select" style="max-width: 200px;">
+            <option value="ALL">Show All Statuses</option>
+            <option value="IN_STOCK">🟢 In Stock Only</option>
+            <option value="LOW_STOCK">⚡ Low Stock Only</option>
+            <option value="OUT_OF_STOCK">🔴 Out of Stock Only</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Inventory Cards List (< 850px) -->
+    <div class="admin-card-list" id="adminCardList">
+      <!-- Rendered via admin.js -->
+    </div>
+
+    <!-- Desktop Data Table (≥ 850px) -->
+    <div class="desktop-table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Smartphone Model</th>
+            <th>Specs</th>
+            <th>Cash Price</th>
+            <th>Lipa Terms</th>
+            <th>Stock Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="adminTableBody">
+          <!-- Rendered via admin.js -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Store Settings Section -->
+    <section style="margin-top: 3rem; background-color: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.5rem;">
+      <h2 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.5rem;">⚙️ Store Contact Configuration</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Update the WhatsApp sales number that customers reach when inquiring or ordering phones.
+      </p>
+
+      <form id="settingsForm" style="max-width: 500px;">
+        <div class="form-group">
+          <label for="configWaNumber" class="form-label">WhatsApp Business Phone Number (International format)</label>
+          <input type="text" id="configWaNumber" class="form-input" placeholder="+254700123456" required />
+        </div>
+
+        <div class="form-group">
+          <label for="configSalesPhone" class="form-label">Sales Hotline Phone Number</label>
+          <input type="text" id="configSalesPhone" class="form-input" placeholder="+254700123456" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm">
+          💾 Save Configuration
+        </button>
+      </form>
+    </section>
+  </main>
+
+  <!-- Mobile Floating Action Button -->
+  <button class="fab-add" id="fabAddPhone" aria-label="Add new phone">
+    +
+  </button>
+
+  <!-- Add/Edit Phone Modal Form -->
+  <div class="modal-overlay" id="adminModalOverlay">
+    <div class="modal-container" style="max-width: 580px;">
+      <button class="modal-close-btn" id="adminModalCloseBtn" aria-label="Close modal">✕</button>
+
+      <h2 id="adminModalTitle" style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem;">Add New Smartphone</h2>
+
+      <form id="phoneForm">
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label for="inputName" class="form-label">Phone Model Name *</label>
+            <input type="text" id="inputName" class="form-input" placeholder="e.g. Infinix Hot 60i" required />
+          </div>
+          <div class="form-group">
+            <label for="inputBrand" class="form-label">Brand *</label>
+            <input type="text" id="inputBrand" class="form-input" placeholder="e.g. Infinix, Tecno, Samsung" required />
+          </div>
+        </div>
+
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label for="inputRam" class="form-label">RAM Size *</label>
+            <input type="text" id="inputRam" class="form-input" placeholder="e.g. 4GB" required />
+          </div>
+          <div class="form-group">
+            <label for="inputStorage" class="form-label">Storage Capacity *</label>
+            <input type="text" id="inputStorage" class="form-input" placeholder="e.g. 128GB" required />
+          </div>
+        </div>
+
+        <div class="form-row form-row-3">
+          <div class="form-group">
+            <label for="inputDeposit" class="form-label">Deposit (KSh) *</label>
+            <input type="number" id="inputDeposit" class="form-input" placeholder="2500" required />
+          </div>
+          <div class="form-group">
+            <label for="inputDaily" class="form-label">Daily Payment (KSh) *</label>
+            <input type="number" id="inputDaily" class="form-input" placeholder="70" required />
+          </div>
+          <div class="form-group">
+            <label for="inputWeekly" class="form-label">Weekly Payment (KSh) *</label>
+            <input type="number" id="inputWeekly" class="form-input" placeholder="490" required />
+          </div>
+        </div>
+
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label for="inputCashPrice" class="form-label">Cash Outright Price (KSh) *</label>
+            <input type="number" id="inputCashPrice" class="form-input" placeholder="14500" required />
+          </div>
+          <div class="form-group">
+            <label for="inputStockStatus" class="form-label">Stock Status *</label>
+            <select id="inputStockStatus" class="form-select" required>
+              <option value="IN_STOCK">🟢 IN STOCK</option>
+              <option value="LOW_STOCK">⚡ LOW STOCK</option>
+              <option value="OUT_OF_STOCK">🔴 OUT OF STOCK</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Phone Image</label>
+
+          <!-- File upload zone with live preview -->
+          <div class="image-upload-zone" id="imageUploadZone" title="Click or drag an image here">
+            <input type="file" id="inputImageFile" accept="image/*" aria-label="Upload phone image" />
+            <div class="image-upload-placeholder" id="uploadPlaceholder">
+              <span class="upload-icon">🖼️</span>
+              <span><strong>Click to upload</strong> or drag &amp; drop an image</span>
+              <span>PNG, JPG, WebP — max 4 MB</span>
+            </div>
+          </div>
+
+          <!-- Live preview thumbnail -->
+          <img id="imagePreviewBox" class="image-preview-box" src="" alt="Image preview" />
+
+          <!-- Option 2: paste any URL or Google Drive share link -->
+          <div class="image-url-divider" style="margin-top:0.75rem;">or paste a URL / Google Drive link</div>
+          <input type="text" id="inputImage" class="form-input"
+            placeholder="https://drive.google.com/file/d/… or /images/phone.png"
+            style="margin-top:0.5rem;" />
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.35rem;">
+            📎 Google Drive links are auto-converted to direct image URLs. Make sure the file is shared as <strong>"Anyone with the link"</strong>.
+          </p>
+
+        </div>
+
+
+        <div class="form-group">
+          <label for="inputDescription" class="form-label">Short Description</label>
+          <textarea id="inputDescription" class="form-textarea" rows="2" placeholder="Highlight display, camera, battery features..."></textarea>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem;">
+          <button type="submit" class="btn btn-primary" id="btnSavePhone">
+            💾 Save Smartphone Item
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Script -->
+
+  </div><!-- /adminContent -->
+</body>
+</html>

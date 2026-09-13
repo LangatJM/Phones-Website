@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Lipa Phones Kenya | Mobile-First Lipa Mdogo Mdogo Smartphones</title>
+  <meta name="description" content="Buy original smartphones in Kenya with flexible daily & weekly Lipa Mdogo Mdogo deposit payment terms. Infinix, Tecno, Samsung, Xiaomi." />
+
+  <!-- Preconnect to Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./src/css/variables.css" />
+  <link rel="stylesheet" href="./src/css/reset.css" />
+  <link rel="stylesheet" href="./src/css/typography.css" />
+  <link rel="stylesheet" href="./src/css/components.css" />
+  <link rel="stylesheet" href="./src/css/layout.css" />
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header class="site-header" id="siteHeader">
+    <div class="nav-container">
+      <a href="#" class="logo-brand" id="brandLogo">
+        <img src="/assets/logo.png" alt="Simu Rahisi Logo" class="brand-logo-img" />
+      </a>
+
+      <!-- Desktop Navbar -->
+      <nav class="desktop-nav" id="desktopNav">
+        <a href="#home" class="active">Home</a>
+        <a href="#catalogue">Available Phones</a>
+        <a href="#lipaInfo">Lipa Mdogo Mdogo</a>
+        <a href="#howItWorks">How It Works</a>
+        <a href="#contact">Contact</a>
+        <a href="./admin.html" style="color: var(--text-muted); font-size: 0.85rem;">🔒 Admin</a>
+        <a href="https://wa.me/254703523393" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm" id="desktopHeaderWaBtn">
+          💬 WhatsApp Us
+        </a>
+      </nav>
+
+      <!-- Mobile Hamburger Button -->
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Overlay & Drawer -->
+  <div class="mobile-drawer-overlay" id="drawerOverlay"></div>
+  <aside class="mobile-drawer" id="mobileDrawer">
+    <div class="mobile-nav-links">
+      <a href="#home" class="mobile-nav-link">Home <span>➔</span></a>
+      <a href="#catalogue" class="mobile-nav-link">Available Phones <span>➔</span></a>
+      <a href="#lipaInfo" class="mobile-nav-link">Lipa Mdogo Mdogo <span>➔</span></a>
+      <a href="#howItWorks" class="mobile-nav-link">How It Works <span>➔</span></a>
+      <a href="#contact" class="mobile-nav-link">Contact Us <span>➔</span></a>
+      <a href="./admin.html" class="mobile-nav-link" style="color: var(--text-muted);">Admin Inventory <span>⚙️</span></a>
+    </div>
+
+    <div class="mobile-drawer-cta">
+      <a href="https://wa.me/254703523393" target="_blank" rel="noopener" class="btn btn-whatsapp btn-block" id="drawerWaBtn">
+        💬 Chat on WhatsApp
+      </a>
+      <a href="tel:+254703523393" class="btn btn-call btn-block" id="drawerCallBtn">
+        📞 Call Sales Agent
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Section (Mobile Optimized Vertical First) -->
+    <section class="hero-section" id="home">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <span class="section-tag">🔥 Lipa Mdogo Mdogo Offer</span>
+          <h1>Own Your Dream Smartphone Today</h1>
+          <p class="subhead">
+            Drive home with an original Infinix, Tecno, Samsung, or Xiaomi phone today with a small initial deposit. Pay remaining balances conveniently daily or weekly via M-Pesa.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#catalogue" class="btn btn-primary" id="heroBrowseBtn">
+              Browse Phones
+            </a>
+            <a href="https://wa.me/254703523393" target="_blank" rel="noopener" class="btn btn-whatsapp" id="heroWaBtn">
+              💬 WhatsApp Us
+            </a>
+            <a href="tel:+254703523393" class="btn btn-call" id="heroCallBtn">
+              📞 Call Sales
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <img src="./public/images/hero-phone.png" alt="Featured Smartphone Lipa Mdogo Mdogo" width="380" height="380" />
+          <div class="hero-floating-badge">
+            <span style="font-size: 1.2rem;">⚡</span>
+            <div>
+              <span style="font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: 700;">DEPOSITS FROM</span>
+              <strong style="font-size: 1rem; color: var(--accent-600);">KSh 2,500 Deposit</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Catalogue Section -->
+    <section class="section-container" id="catalogue">
+      <div class="section-header">
+        <span class="section-tag">Available Inventory</span>
+        <h2>Explore Available Smartphones</h2>
+        <p class="subhead">Choose your favorite model and check deposit & daily payment terms.</p>
+      </div>
+
+      <!-- Controls: Search Input & Horizontal Pill Filters -->
+      <div class="catalogue-controls">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search phone name, brand, RAM, storage..." aria-label="Search smartphones" />
+        </div>
+
+        <div class="brand-pills-bar" id="brandFilterBar">
+          <button class="pill-btn is-active" data-brand="ALL">All Phones</button>
+          <button class="pill-btn" data-brand="INFINIX">Infinix</button>
+          <button class="pill-btn" data-brand="TECNO">Tecno</button>
+          <button class="pill-btn" data-brand="VIVO">Vivo</button>
+          <button class="pill-btn" data-brand="OPPO">Oppo</button>
+          <button class="pill-btn" data-brand="REALME">Realme</button>
+          <button class="pill-btn" data-brand="REDMI">Redmi</button>
+          <button class="pill-btn" data-brand="ITEL">Itel</button>
+          <button class="pill-btn" data-brand="ZTE">ZTE</button>
+          <button class="pill-btn" data-brand="SAFARICOM">Safaricom</button>
+          <button class="pill-btn" data-brand="LENIX">Lenix</button>
+          <button class="pill-btn" data-brand="VILLAON">Villaon</button>
+        </div>
+      </div>
+
+      <!-- Dynamic Product Grid -->
+      <div class="phone-grid" id="phoneGrid">
+        <!-- Rendered via app.js -->
+      </div>
+    </section>
+
+    <!-- Lipa Mdogo Mdogo How It Works Section -->
+    <section class="section-container" id="lipaInfo" style="background-color: var(--bg-card); border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+      <div class="section-header">
+        <span class="section-tag">Simple Process</span>
+        <h2>How Lipa Mdogo Mdogo Works</h2>
+        <p class="subhead">Get your phone in 4 easy steps without complicated paperwork.</p>
+      </div>
+
+      <div class="steps-grid" id="howItWorks">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h3 style="font-size: 1.1rem; font-weight: 700;">Choose Your Phone</h3>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">Browse our catalog and select a phone that matches your budget and specs.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h3 style="font-size: 1.1rem; font-weight: 700;">Verification</h3>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">Present your original Kenyan National ID and an active M-Pesa phone number.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h3 style="font-size: 1.1rem; font-weight: 700;">Pay Initial Deposit</h3>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">Pay the required small initial deposit starting from as low as KSh 2,500.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <h3 style="font-size: 1.1rem; font-weight: 700;">Take Phone Home</h3>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">Walk away with your brand new smartphone immediately and pay remaining daily rates via M-Pesa!</p>
+        </div>
+      </div>
+
+      <!-- Requirements Highlight Card -->
+      <div class="requirements-box">
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary);">📋 Mandatory Customer Requirements</h3>
+        <div class="req-list">
+          <div class="req-item">
+            <span class="req-icon">🪪</span>
+            <div>
+              <strong style="font-size: 0.9rem; display: block;">Original National ID</strong>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Must be valid and physical ID card.</span>
+            </div>
+          </div>
+
+          <div class="req-item">
+            <span class="req-icon">📲</span>
+            <div>
+              <strong style="font-size: 0.9rem; display: block;">Registered M-Pesa Line</strong>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Must match your National ID details.</span>
+            </div>
+          </div>
+
+          <div class="req-item">
+            <span class="req-icon">💵</span>
+            <div>
+              <strong style="font-size: 0.9rem; display: block;">Initial Deposit Payment</strong>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Paid via M-Pesa at collection.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer" id="contact">
+    <div class="footer-grid">
+      <div>
+        <div class="logo-brand" style="margin-bottom: 0.75rem;">
+          <img src="/assets/logo.png" alt="Simu Rahisi Logo" class="brand-logo-img" style="height: 48px;" />
+        </div>
+        <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.6;">
+          Kenya's trusted mobile shop for genuine smartphones on flexible Lipa Mdogo Mdogo installment payment plans.
+        </p>
+      </div>
+
+      <div>
+        <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.75rem;">Quick Contact</h4>
+        <p style="font-size: 0.85rem; margin-bottom: 0.35rem;">📍 Tom Mboya Street, Nairobi CBD</p>
+        <p style="font-size: 0.85rem; margin-bottom: 0.35rem;">📞 Call Sales: +254 703 523 393</p>
+        <p style="font-size: 0.85rem;">💬 WhatsApp: +254 703 523 393</p>
+      </div>
+
+      <div>
+        <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.75rem;">Staff Access</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Manage inventory & stock levels from any mobile phone or desktop.</p>
+        <a href="./admin.html" class="btn btn-call btn-sm" id="footerAdminLink">
+          🔒 Admin Dashboard Login
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      &copy; 2026 Lipa Phones Kenya. All rights reserved. Designed Mobile-First.
+    </div>
+  </footer>
+
+  <!-- Mobile Sticky Bottom Contact Toolbar -->
+  <div class="sticky-bottom-bar" id="stickyBottomBar">
+    <a href="https://wa.me/254703523393" target="_blank" rel="noopener" class="btn btn-whatsapp" id="stickyWaBtn">
+      💬 WhatsApp Us
+    </a>
+    <a href="tel:+254703523393" class="btn btn-call" id="stickyCallBtn">
+      📞 Call Sales
+    </a>
+  </div>
+
+  <!-- Product Detail Modal Sheet -->
+  <div class="modal-overlay" id="phoneModalOverlay">
+    <div class="modal-container">
+      <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close modal">✕</button>
+      <div id="modalBody">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- App Script -->
+  <script type="module" src="./src/js/app.js"></script>
+</body>
+</html>
