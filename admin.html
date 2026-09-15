@@ -169,8 +169,64 @@
       </table>
     </div>
 
+    <!-- Cloud Sync & Multi-Device Storage Section -->
+    <section style="margin-top: 2.5rem; background-color: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+          ☁️ Multi-Device Cloud Sync (Supabase)
+        </h2>
+        <span id="cloudStatusBadge" class="stock-badge" style="background-color: rgba(239, 68, 68, 0.15); color: #ef4444; font-weight: 700;">
+          🔴 Offline (Local Storage)
+        </span>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+        Connect your free <strong>Supabase</strong> project to store images in Cloud Storage and sync smartphone updates to <strong>all devices and live visitors</strong> in real-time.
+      </p>
+
+      <form id="supabaseConfigForm" style="max-width: 650px;">
+        <div class="form-group">
+          <label for="inputSupabaseUrl" class="form-label">Supabase Project URL</label>
+          <input type="url" id="inputSupabaseUrl" class="form-input" placeholder="https://your-project-id.supabase.co" />
+        </div>
+
+        <div class="form-group">
+          <label for="inputSupabaseKey" class="form-label">Supabase Anon Public API Key</label>
+          <input type="password" id="inputSupabaseKey" class="form-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+          <button type="submit" class="btn btn-primary btn-sm" id="btnSaveSupabase">
+            🔗 Connect Supabase
+          </button>
+          <button type="button" class="btn btn-call btn-sm" id="btnSyncSeedCatalog" style="display: none;">
+            ⚡ Upload Seed Catalog to Cloud
+          </button>
+          <button type="button" class="btn btn-call btn-sm" id="btnToggleSqlGuide">
+            📋 Supabase SQL &amp; Setup Guide
+          </button>
+        </div>
+        <div id="supabaseFeedback" style="font-size: 0.85rem; margin-top: 0.75rem; display: none; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm);"></div>
+      </form>
+
+      <!-- SQL Guide Accordion / Box -->
+      <div id="supabaseSqlBox" style="display: none; margin-top: 1.25rem; background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1rem;">
+        <div style="font-weight: 700; font-size: 0.9rem; margin-bottom: 0.5rem;">Supabase Quick Setup (Run once in Supabase SQL Editor):</div>
+        <ol style="font-size: 0.8rem; color: var(--text-muted); margin-left: 1.25rem; margin-bottom: 0.75rem; line-height: 1.5;">
+          <li>Create a free project at <a href="https://supabase.com" target="_blank" style="color: var(--accent-600); text-decoration: underline;">supabase.com</a>.</li>
+          <li>Go to <strong>SQL Editor</strong> &gt; <strong>New Query</strong>, paste the script below, and click <strong>RUN</strong>.</li>
+          <li>Copy your <strong>Project URL</strong> and <strong>anon public key</strong> from <em>Project Settings &gt; API</em> and paste them above.</li>
+        </ol>
+        <div style="position: relative;">
+          <pre id="supabaseSqlCode" style="background: #1e1e2e; color: #cdd6f4; padding: 0.85rem; border-radius: var(--radius-sm); font-size: 0.75rem; overflow-x: auto; max-height: 220px; white-space: pre;"></pre>
+          <button type="button" id="btnCopySql" class="btn btn-call btn-sm" style="position: absolute; top: 0.5rem; right: 0.5rem; font-size: 0.75rem; padding: 0.2rem 0.6rem;">
+            📋 Copy SQL
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- Store Settings Section -->
-    <section style="margin-top: 3rem; background-color: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.5rem;">
+    <section style="margin-top: 2rem; background-color: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.5rem;">
       <h2 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.5rem;">⚙️ Store Contact Configuration</h2>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
         Update the WhatsApp sales number that customers reach when inquiring or ordering phones.
@@ -268,9 +324,12 @@
             <div class="image-upload-placeholder" id="uploadPlaceholder">
               <span class="upload-icon">🖼️</span>
               <span><strong>Click to upload</strong> or drag &amp; drop an image</span>
-              <span>PNG, JPG, WebP — max 4 MB</span>
+              <span>PNG, JPG, WebP — max 5 MB</span>
             </div>
           </div>
+
+          <!-- Live upload status notification -->
+          <div id="imageUploadStatus" style="display: none; font-size: 0.8rem; margin-top: 0.5rem; padding: 0.45rem 0.75rem; border-radius: var(--radius-sm);"></div>
 
           <!-- Live preview thumbnail -->
           <img id="imagePreviewBox" class="image-preview-box" src="" alt="Image preview" />

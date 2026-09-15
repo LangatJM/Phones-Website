@@ -1,6 +1,13 @@
 // Mobile-First Admin Dashboard Controller
 import { store } from './store.js';
 import { ADMIN_PASSWORD, driveUrlToImage } from './config.js';
+import {
+  isSupabaseConfigured,
+  getSupabaseCredentials,
+  saveSupabaseCredentials,
+  uploadImageToSupabase
+} from './supabase.js';
+
 
 document.addEventListener('DOMContentLoaded', () => {
   initAuth();        // must run first — guards entire page
@@ -93,11 +100,14 @@ function initAdminDashboard() {
   renderInventory();
   renderStats();
   renderSettings();
+  initSupabaseDashboard();
 
   store.subscribe(() => {
     renderInventory();
     renderStats();
+    updateCloudStatusBadge();
   });
+
 
   // Admin Search filter
   const adminSearch = document.getElementById('adminSearchInput');
@@ -267,8 +277,14 @@ function initAdminForms() {
   }
 
   if (phoneForm) {
-    phoneForm.addEventListener('submit', (e) => {
+    phoneForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const saveBtn = document.getElementById('btnSavePhone');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = '⏳ Saving...';
+      }
+
       const formData = {
         name: document.getElementById('inputName').value.trim(),
         brand: document.getElementById('inputBrand').value.trim(),
@@ -279,17 +295,25 @@ function initAdminForms() {
         dailyPayment: Number(document.getElementById('inputDaily').value),
         weeklyPayment: Number(document.getElementById('inputWeekly').value),
         stockStatus: document.getElementById('inputStockStatus').value,
-      image: driveUrlToImage(document.getElementById('inputImage').value.trim()) || '/images/infinix-hot-60i.png',
+        image: driveUrlToImage(document.getElementById('inputImage').value.trim()) || '/images/hero-phone.png',
         description: document.getElementById('inputDescription').value.trim()
       };
 
-      if (editingPhoneId) {
-        store.updatePhone(editingPhoneId, formData);
-      } else {
-        store.addPhone(formData);
+      try {
+        if (editingPhoneId) {
+          await store.updatePhone(editingPhoneId, formData);
+        } else {
+          await store.addPhone(formData);
+        }
+      } catch (err) {
+        console.error('Error saving phone item:', err);
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = '💾 Save Smartphone Item';
+        }
+        closePhoneFormModal();
       }
-
-      closePhoneFormModal();
     });
   }
 
@@ -304,11 +328,11 @@ function initAdminForms() {
   }
 }
 
-// ── Image Upload: FileReader → Base64 data URL stored in inputImage ──
+// ── Image Upload: Direct to Supabase Storage if connected, or local preview ──
 function initImageUpload() {
-  const fileInput  = document.getElementById('inputImageFile');
-  const urlInput   = document.getElementById('inputImage');
-  const preview    = document.getElementById('imagePreviewBox');
+  const fileInput   = document.getElementById('inputImageFile');
+  const urlInput    = document.getElementById('inputImage');
+  const preview     = document.getElementById('imagePreviewBox');
   const placeholder = document.getElementById('uploadPlaceholder');
 
   if (!fileInput || !urlInput || !preview) return;
@@ -351,16 +375,42 @@ function initImageUpload() {
   });
 }
 
-function loadFileIntoPreview(file, urlInput, preview, placeholder) {
-  if (file.size > 4 * 1024 * 1024) {
-    alert('Image is too large (max 4 MB). Please choose a smaller file.');
+async function loadFileIntoPreview(file, urlInput, preview, placeholder) {
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Image is too large (max 5 MB). Please choose a smaller file.');
     return;
   }
+
+  const statusEl = document.getElementById('imageUploadStatus');
+  const showStatus = (msg, isError = false) => {
+    if (!statusEl) return;
+    statusEl.style.display = 'block';
+    statusEl.style.background = isError ? 'rgba(239, 68, 68, 0.15)' : 'rgba(34, 197, 94, 0.15)';
+    statusEl.style.color = isError ? '#ef4444' : '#16a34a';
+    statusEl.textContent = msg;
+  };
+
   const reader = new FileReader();
-  reader.onload = (ev) => {
-    const dataUrl = ev.target.result;
-    urlInput.value = dataUrl; // store Base64 as the image value
-    showPreview(preview, placeholder, dataUrl);
+  reader.onload = async (ev) => {
+    const localDataUrl = ev.target.result;
+    showPreview(preview, placeholder, localDataUrl);
+
+    if (isSupabaseConfigured()) {
+      showStatus('☁️ Uploading photo to Supabase Cloud Storage...');
+      try {
+        const publicUrl = await uploadImageToSupabase(file);
+        urlInput.value = publicUrl;
+        showPreview(preview, placeholder, publicUrl);
+        showStatus('✅ Uploaded to Cloud Storage! Photo will appear on all devices.');
+      } catch (err) {
+        console.error('Cloud image upload failed:', err);
+        showStatus('⚠️ Cloud upload failed: ' + (err.message || 'Check storage bucket permissions'), true);
+        urlInput.value = localDataUrl;
+      }
+    } else {
+      urlInput.value = localDataUrl;
+      showStatus('⚠️ Saved in local browser memory only. Connect Supabase below to make photos visible on all devices.', true);
+    }
   };
   reader.readAsDataURL(file);
 }
@@ -376,7 +426,6 @@ function clearPreview(preview, placeholder) {
   preview.classList.remove('has-image');
   if (placeholder) placeholder.style.display = '';
 }
-
 
 function openPhoneFormModal(phoneId = null) {
   editingPhoneId = phoneId;
@@ -411,9 +460,15 @@ function openPhoneFormModal(phoneId = null) {
   document.body.style.overflow = 'hidden';
 
   // Sync image preview with existing value
-  const urlInput  = document.getElementById('inputImage');
-  const preview   = document.getElementById('imagePreviewBox');
+  const urlInput    = document.getElementById('inputImage');
+  const preview     = document.getElementById('imagePreviewBox');
   const placeholder = document.getElementById('uploadPlaceholder');
+  const statusEl    = document.getElementById('imageUploadStatus');
+  if (statusEl) {
+    statusEl.style.display = 'none';
+    statusEl.textContent = '';
+  }
+
   if (urlInput && preview) {
     const val = urlInput.value.trim();
     if (val) {
@@ -435,6 +490,177 @@ function closePhoneFormModal() {
   const fileInput   = document.getElementById('inputImageFile');
   const preview     = document.getElementById('imagePreviewBox');
   const placeholder = document.getElementById('uploadPlaceholder');
+  const statusEl    = document.getElementById('imageUploadStatus');
   if (fileInput) fileInput.value = '';
   if (preview && placeholder) clearPreview(preview, placeholder);
+  if (statusEl) {
+    statusEl.style.display = 'none';
+    statusEl.textContent = '';
+  }
+}
+
+// ── Supabase Cloud Dashboard Management ──
+const SUPABASE_SETUP_SQL = `-- 1. Create phones inventory table
+create table if not exists public.phones (
+  id text primary key,
+  name text not null,
+  brand text,
+  ram text,
+  storage text,
+  cash_price numeric,
+  deposit numeric,
+  daily_payment numeric,
+  weekly_payment numeric,
+  stock_status text default 'IN_STOCK',
+  image text,
+  description text,
+  specs jsonb default '{}'::jsonb,
+  created_at timestamp with time zone default now()
+);
+
+-- 2. Enable Row Level Security (RLS)
+alter table public.phones enable row level security;
+
+-- 3. Public read policy (all visitors can view phones)
+create policy "Allow public read on phones" on public.phones 
+for select using (true);
+
+-- 4. Allow insert/update/delete with anon key
+create policy "Allow anon insert on phones" on public.phones 
+for insert with check (true);
+
+create policy "Allow anon update on phones" on public.phones 
+for update using (true);
+
+create policy "Allow anon delete on phones" on public.phones 
+for delete using (true);
+
+-- 5. Create storage bucket for uploaded phone images
+insert into storage.buckets (id, name, public)
+values ('phone-images', 'phone-images', true)
+on conflict (id) do nothing;
+
+-- 6. Storage security policies for phone-images bucket
+create policy "Public images are viewable by everyone" on storage.objects
+for select using (bucket_id = 'phone-images');
+
+create policy "Anyone can upload phone images" on storage.objects
+for insert with check (bucket_id = 'phone-images');
+
+create policy "Anyone can update phone images" on storage.objects
+for update using (bucket_id = 'phone-images');`;
+
+function updateCloudStatusBadge() {
+  const badge = document.getElementById('cloudStatusBadge');
+  const syncBtn = document.getElementById('btnSyncSeedCatalog');
+  if (!badge) return;
+
+  if (store.cloudConnected) {
+    badge.textContent = '🟢 Connected (Supabase Cloud)';
+    badge.style.backgroundColor = 'rgba(34, 197, 94, 0.15)';
+    badge.style.color = '#16a34a';
+    if (syncBtn) syncBtn.style.display = 'inline-block';
+  } else if (isSupabaseConfigured()) {
+    badge.textContent = '🟡 Connecting to Supabase...';
+    badge.style.backgroundColor = 'rgba(234, 179, 8, 0.15)';
+    badge.style.color = '#ca8a04';
+    if (syncBtn) syncBtn.style.display = 'inline-block';
+  } else {
+    badge.textContent = '🔴 Offline (Local Storage)';
+    badge.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+    badge.style.color = '#ef4444';
+    if (syncBtn) syncBtn.style.display = 'none';
+  }
+}
+
+function initSupabaseDashboard() {
+  const form = document.getElementById('supabaseConfigForm');
+  const urlInput = document.getElementById('inputSupabaseUrl');
+  const keyInput = document.getElementById('inputSupabaseKey');
+  const feedback = document.getElementById('supabaseFeedback');
+  const syncBtn = document.getElementById('btnSyncSeedCatalog');
+  const toggleSqlBtn = document.getElementById('btnToggleSqlGuide');
+  const sqlBox = document.getElementById('supabaseSqlBox');
+  const sqlPre = document.getElementById('supabaseSqlCode');
+  const copySqlBtn = document.getElementById('btnCopySql');
+
+  // Fill existing credentials
+  const { url, key } = getSupabaseCredentials();
+  if (urlInput && url) urlInput.value = url;
+  if (keyInput && key) keyInput.value = key;
+
+  if (sqlPre) sqlPre.textContent = SUPABASE_SETUP_SQL;
+
+  updateCloudStatusBadge();
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const enteredUrl = urlInput.value.trim();
+      const enteredKey = keyInput.value.trim();
+
+      saveSupabaseCredentials(enteredUrl, enteredKey);
+
+      if (feedback) {
+        feedback.style.display = 'block';
+        feedback.style.background = 'rgba(59, 130, 246, 0.15)';
+        feedback.style.color = 'var(--primary-600)';
+        feedback.textContent = '🔄 Connecting to Supabase...';
+      }
+
+      await store.initCloudSync();
+      updateCloudStatusBadge();
+
+      if (feedback) {
+        if (store.cloudConnected) {
+          feedback.style.background = 'rgba(34, 197, 94, 0.15)';
+          feedback.style.color = '#16a34a';
+          feedback.textContent = '✅ Connected to Supabase! Smartphone images and inventory are now synced across all devices in real time.';
+        } else {
+          feedback.style.background = 'rgba(239, 68, 68, 0.15)';
+          feedback.style.color = '#ef4444';
+          feedback.textContent = '⚠️ Could not connect to Supabase. Please check your Project URL, anon key, and ensure the SQL setup was run in Supabase SQL Editor.';
+        }
+      }
+    });
+  }
+
+  if (syncBtn) {
+    syncBtn.addEventListener('click', async () => {
+      if (!confirm('This will upload all smartphones in your local catalog to Supabase. Continue?')) {
+        return;
+      }
+      syncBtn.disabled = true;
+      syncBtn.textContent = '⏳ Uploading to Cloud...';
+      try {
+        await store.syncAllToSupabase();
+        alert('✅ Catalog successfully synced to Supabase Cloud!');
+      } catch (err) {
+        alert('❌ Sync failed: ' + (err.message || 'Check connection'));
+      } finally {
+        syncBtn.disabled = false;
+        syncBtn.textContent = '⚡ Upload Seed Catalog to Cloud';
+      }
+    });
+  }
+
+  if (toggleSqlBtn && sqlBox) {
+    toggleSqlBtn.addEventListener('click', () => {
+      const isVisible = sqlBox.style.display !== 'none';
+      sqlBox.style.display = isVisible ? 'none' : 'block';
+      toggleSqlBtn.textContent = isVisible ? '📋 Supabase SQL & Setup Guide' : '✕ Hide SQL Guide';
+    });
+  }
+
+  if (copySqlBtn) {
+    copySqlBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(SUPABASE_SETUP_SQL);
+        copySqlBtn.textContent = '✅ Copied!';
+        setTimeout(() => { copySqlBtn.textContent = '📋 Copy SQL'; }, 2000);
+      } catch (e) {
+        copySqlBtn.textContent = 'Select & copy manually';
+      }
+    });
+  }
 }

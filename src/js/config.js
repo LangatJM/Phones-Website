@@ -14,6 +14,20 @@ export const DEFAULT_CONFIG = {
 // Change this value to set a new password
 export const ADMIN_PASSWORD = "simurahisi2026";
 
+// Supabase Cloud Storage & Database Configuration
+// Automatically configured for your project
+export const SUPABASE_URL =
+  import.meta.env?.VITE_SUPABASE_URL ||
+  import.meta.env?.NEXT_PUBLIC_SUPABASE_URL ||
+  "https://axvzytfwvdrgznovuokv.supabase.co";
+
+export const SUPABASE_ANON_KEY =
+  import.meta.env?.VITE_SUPABASE_ANON_KEY ||
+  import.meta.env?.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  "sb_publishable_s2uvetAGCarvR7y60Ew6JA_3C9fxdt5";
+
+
+
 /**
  * Converts any Google Drive sharing URL into a direct embeddable image URL.
  * Supports:
