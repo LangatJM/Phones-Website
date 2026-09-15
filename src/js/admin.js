@@ -522,16 +522,20 @@ create table if not exists public.phones (
 alter table public.phones enable row level security;
 
 -- 3. Public read policy (all visitors can view phones)
+drop policy if exists "Allow public read on phones" on public.phones;
 create policy "Allow public read on phones" on public.phones 
 for select using (true);
 
 -- 4. Allow insert/update/delete with anon key
+drop policy if exists "Allow anon insert on phones" on public.phones;
 create policy "Allow anon insert on phones" on public.phones 
 for insert with check (true);
 
+drop policy if exists "Allow anon update on phones" on public.phones;
 create policy "Allow anon update on phones" on public.phones 
 for update using (true);
 
+drop policy if exists "Allow anon delete on phones" on public.phones;
 create policy "Allow anon delete on phones" on public.phones 
 for delete using (true);
 
@@ -541,12 +545,15 @@ values ('phone-images', 'phone-images', true)
 on conflict (id) do nothing;
 
 -- 6. Storage security policies for phone-images bucket
+drop policy if exists "Public images are viewable by everyone" on storage.objects;
 create policy "Public images are viewable by everyone" on storage.objects
 for select using (bucket_id = 'phone-images');
 
+drop policy if exists "Anyone can upload phone images" on storage.objects;
 create policy "Anyone can upload phone images" on storage.objects
 for insert with check (bucket_id = 'phone-images');
 
+drop policy if exists "Anyone can update phone images" on storage.objects;
 create policy "Anyone can update phone images" on storage.objects
 for update using (bucket_id = 'phone-images');`;
 
